@@ -1,0 +1,35 @@
+name: Design Doc Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  design-doc-review:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Run Design Doc Review Agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          # Defaults to current repo; override by setting vars.TARGET_REPO in repo settings
+          REPO_FULL_NAME: ${{ vars.TARGET_REPO || github.repository }}
+          # Set vars.SCORE_THRESHOLD in repo settings (Settings → Secrets and variables → Variables)
+          SCORE_THRESHOLD: ${{ vars.SCORE_THRESHOLD || '7' }}
+        run: python agent/review.py
