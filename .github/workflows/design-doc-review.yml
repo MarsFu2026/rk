@@ -25,7 +25,9 @@ jobs:
 
       - name: Run Design Doc Review Agent
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BEDROCK_BASE_URL: "https://api.ai.public.rakuten-it.com/claude-code-aws-bedrock/v1"
+          AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.RAKUTEN_AI_GATEWAY_TOKEN }}
+          CLAUDE_CODE_SKIP_BEDROCK_AUTH: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           # Defaults to current repo; override by setting vars.TARGET_REPO in repo settings

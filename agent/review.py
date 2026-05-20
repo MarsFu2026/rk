@@ -8,7 +8,6 @@ import anthropic
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-ANTHROPIC_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
 PR_NUMBER = os.environ["PR_NUMBER"]
 REPO_FULL_NAME = os.environ["REPO_FULL_NAME"]
@@ -112,9 +111,14 @@ def call_claude(pr_body: str, docs: dict[str, str], diff: str) -> tuple[int, str
 {diff or '_No diff available._'}
 ```"""
 
-    client = anthropic.Anthropic()
+    client = anthropic.AnthropicBedrock(
+        base_url=os.environ["ANTHROPIC_BEDROCK_BASE_URL"],
+        aws_access_key="dummy",
+        aws_secret_key="dummy",
+        aws_session_token=os.environ["AWS_BEARER_TOKEN_BEDROCK"],
+    )
     message = client.messages.create(
-        model="claude-sonnet-4-5",
+        model="anthropic.claude-sonnet-4-5-20250929-v1:0",
         max_tokens=1024,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_message}],
