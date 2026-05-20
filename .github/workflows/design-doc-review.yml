@@ -26,7 +26,7 @@ jobs:
 
       - name: Run Design Doc Review Agent
         env:
-          GITHUB_MODELS_TOKEN: ${{ secrets.GITHUB_MODELS_TOKEN }}
+          MY_MODELS_TOKEN: ${{ secrets.MY_MODELS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           # Defaults to current repo; override by setting vars.TARGET_REPO in repo settings

@@ -113,7 +113,7 @@ def call_claude(pr_body: str, docs: dict[str, str], diff: str) -> tuple[int, str
 
     client = OpenAI(
         base_url="https://models.github.ai/inference",
-        api_key=os.environ["GITHUB_MODELS_TOKEN"],
+        api_key=os.environ["MY_MODELS_TOKEN"],
     )
     message = client.chat.completions.create(
         model="gpt-4o",
