@@ -217,4 +217,5 @@ def main_slack_test() -> None:
     print(f"Slack notification sent: PR #{pr['number']} [{event}]")
 
 if __name__ == "__main__":
-    main()
+    # main()
+    main_slack_test()
