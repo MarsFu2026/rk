@@ -200,17 +200,10 @@ def main_slack_test() -> None:
 
     pr = {
         "number":    os.environ["PR_NUMBER"],
-        "title":     os.environ["PR_TITLE"],
-        "url":       os.environ["PR_URL"],
-        "author":    os.environ["PR_AUTHOR"],
-        "repo":      os.environ["PR_REPO"],
-        "head":      os.environ["PR_HEAD_BRANCH"],
-        "base":      os.environ["PR_BASE_BRANCH"],
-        "reviewers": os.environ.get("PR_REVIEWERS", ""),
     }
     event = os.environ["PR_ACTION"]  # opened / closed / review_requested ...
 
-    payload = build_payload(event, pr)
+    payload = build_slack_payload(event, pr)
 
     resp = requests.post(
         webhook_url,
@@ -224,5 +217,4 @@ def main_slack_test() -> None:
     print(f"Slack notification sent: PR #{pr['number']} [{event}]")
 
 if __name__ == "__main__":
-    # main()
-    main_slack_test()
+    main()
