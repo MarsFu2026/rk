@@ -189,5 +189,40 @@ def main() -> None:
         sys.exit(1)
 
 
+def build_slack_payload(event, pr):
+    return {
+        "text": f"PR #{pr['number']} [{event}]: {pr['title']}\n{pr['url']}"
+    }
+
+
+def main_slack_test() -> None:
+    webhook_url = os.environ["SLACK_WEBHOOK_URL"]
+
+    pr = {
+        "number":    os.environ["PR_NUMBER"],
+        "title":     os.environ["PR_TITLE"],
+        "url":       os.environ["PR_URL"],
+        "author":    os.environ["PR_AUTHOR"],
+        "repo":      os.environ["PR_REPO"],
+        "head":      os.environ["PR_HEAD_BRANCH"],
+        "base":      os.environ["PR_BASE_BRANCH"],
+        "reviewers": os.environ.get("PR_REVIEWERS", ""),
+    }
+    event = os.environ["PR_ACTION"]  # opened / closed / review_requested ...
+
+    payload = build_payload(event, pr)
+
+    resp = requests.post(
+        webhook_url,
+        data=json.dumps(payload),
+        headers={"Content-Type": "application/json"},
+        timeout=10
+    )
+    if resp.status_code != 200 or resp.text != "ok":
+        raise RuntimeError(f"Slack notification failed: {resp.status_code} {resp.text}")
+
+    print(f"Slack notification sent: PR #{pr['number']} [{event}]")
+
 if __name__ == "__main__":
-    main()
+    # main()
+    main_slack_test()
