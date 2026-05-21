@@ -191,7 +191,7 @@ def main() -> None:
 
 def build_slack_payload(event, pr):
     return {
-        "text": f"PR #{pr['number']}"
+        "text": f"@frankAI, please review the PR ({pr['url']})."
     }
 
 
@@ -199,7 +199,8 @@ def main_slack_test() -> None:
     webhook_url = os.environ["SLACK_WEBHOOK_URL"]
 
     pr = {
-        "number":    os.environ["PR_NUMBER"],
+        "number": os.environ["PR_NUMBER"],
+        "url":    os.environ["PR_URL"],
     }
     event = os.environ["PR_ACTION"]  # opened / closed / review_requested ...
 
