@@ -191,7 +191,7 @@ def main() -> None:
 
 def build_slack_payload(event, pr):
     return {
-        "text": f"PR #{pr['number']} [{event}]: {pr['title']}\n{pr['url']}"
+        "text": f"PR #{pr['number']}"
     }
 
 
