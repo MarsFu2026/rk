@@ -7,6 +7,7 @@ on:
 jobs:
   design-doc-review:
     runs-on: ubuntu-latest
+    # runs-on: self-hosted
     permissions:
       pull-requests: write
       contents: read
@@ -21,13 +22,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install anthropic requests
+        run: pip install openai requests
 
       - name: Run Design Doc Review Agent
         env:
-          ANTHROPIC_BEDROCK_BASE_URL: "https://api.ai.public.rakuten-it.com/claude-code-aws-bedrock/v1"
-          AWS_BEARER_TOKEN_BEDROCK: ${{ secrets.RAKUTEN_AI_GATEWAY_TOKEN }}
-          CLAUDE_CODE_SKIP_BEDROCK_AUTH: "1"
+          MY_MODELS_TOKEN: ${{ secrets.MY_MODELS_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           # Defaults to current repo; override by setting vars.TARGET_REPO in repo settings

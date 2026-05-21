@@ -3,7 +3,7 @@ import re
 import sys
 import json
 import requests
-import anthropic
+from openai import OpenAI
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -111,19 +111,19 @@ def call_claude(pr_body: str, docs: dict[str, str], diff: str) -> tuple[int, str
 {diff or '_No diff available._'}
 ```"""
 
-    client = anthropic.AnthropicBedrock(
-        base_url=os.environ["ANTHROPIC_BEDROCK_BASE_URL"],
-        aws_access_key="dummy",
-        aws_secret_key="dummy",
-        aws_session_token=os.environ["AWS_BEARER_TOKEN_BEDROCK"],
+    client = OpenAI(
+        base_url="https://models.github.ai/inference",
+        api_key=os.environ["MY_MODELS_TOKEN"],
     )
-    message = client.messages.create(
-        model="anthropic.claude-sonnet-4-5-20250929-v1:0",
+    message = client.chat.completions.create(
+        model="gpt-4o",
         max_tokens=1024,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_message}],
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message},
+        ],
     )
-    raw = message.content[0].text.strip()
+    raw = message.choices[0].message.content.strip()
 
     try:
         parsed = json.loads(raw)
