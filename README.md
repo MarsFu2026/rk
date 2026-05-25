@@ -1,98 +1,124 @@
-# Design Doc Review Agent
+# PR Slack FrankAI Reviewer Trigger
 
-A GitHub Actions CI check that automatically reviews pull requests against linked design/requirement documents using Claude.
+A reusable GitHub Actions workflow that sends a Slack notification to `@Frank AI` when a pull request event occurs.
 
-## How It Works
+---
 
-1. Developer opens or updates a PR — include links to design/requirement docs in the PR description
-2. The CI check triggers, fetches those documents, reads the PR diff
-3. Claude analyzes alignment and produces suggestions + a score (0–10)
-4. Results are posted as a PR comment
-5. If `score >= SCORE_THRESHOLD` → check passes (green); otherwise → check fails (blocks merge)
+## 1. How It Works
 
-## Setup
+1. A PR event in the caller repo triggers the caller workflow
+2. The caller workflow invokes `pr_slack_frank_ai_reviewer_trigger.yml` in this repo via `workflow_call`, passing the PR URL
+3. The reusable workflow runs `pr_slack_frank_ai_reviewer_trigger.py`
+4. The script reads `SLACK_WEBHOOK_URL` and `FRANK_AI_MENTION`, then posts a Slack notification
 
-### 1. Push this repo to GitHub
-
-The workflow file must be on the default branch (`main`) to activate.
-
-### 2. Add the Anthropic API Key
-
-**Repo → Settings → Secrets and variables → Actions → Secrets tab**
-
-| Name | Value |
-|---|---|
-| `ANTHROPIC_API_KEY` | Your key from console.anthropic.com |
-
-### 3. Set the Score Threshold (optional, default = 7)
-
-**Repo → Settings → Secrets and variables → Actions → Variables tab**
-
-| Name | Value |
-|---|---|
-| `SCORE_THRESHOLD` | `7` (integer 0–10) |
-
-Change this at any time — takes effect on the next PR trigger.
-
-### 4. Allow the workflow to post PR comments
-
-**Repo → Settings → Actions → General → Workflow permissions**
-
-Select **"Read and write permissions"** → Save
-
-### 5. Configure Branch Protection to enforce the check
-
-**Repo → Settings → Branches → Add branch protection rule**
-
-- Branch pattern: `main`
-- Enable: **"Require status checks to pass before merging"**
-- Add status check: `design-doc-review`
-  _(must have run at least once before it appears in the search — open a test PR first)_
-
-### 6. Target a Different Repo (optional)
-
-By default the agent reviews PRs in the repo where the workflow lives. To point it at another repo:
-
-**Repo → Settings → Secrets and variables → Actions → Variables tab**
-
-| Name | Value |
-|---|---|
-| `TARGET_REPO` | `owner/other-repo` |
-
-For cross-repo access, also add a PAT with `repo` scope as `secrets.GH_PAT` and update the workflow to use it instead of `secrets.GITHUB_TOKEN`.
-
-## Writing PR Descriptions for Best Results
-
-Include direct links to your design and requirement documents in the PR body:
-
+Message format:
 ```
-## Changes
-- Added user authentication flow
-
-## Design Docs
-- [Requirements](https://docs.google.com/document/d/YOUR_DOC_ID/edit)
-- [Design Doc](https://docs.google.com/document/d/YOUR_DOC_ID/edit)
+@Frank AI, please review the PR (https://github.com/owner/repo/pull/123).
 ```
 
-The agent extracts all `https://` links from the PR description automatically.
+---
 
-**Supported document types:**
-- Google Docs (public) — auto-converted to plain text export
-- Any other public URL (GitHub raw files, Confluence public pages, etc.)
+## 2. Configuration (This Repo)
 
-**Not supported (POC limitation):**
-- Private Google Docs / Notion pages (requires OAuth)
+**Settings → Secrets and variables → Actions → Secrets**
 
-## Local Testing
+| Secret | Required | Description |
+|--------|----------|-------------|
+| `SLACK_WEBHOOK_URL` | Yes | Slack Incoming Webhook URL (generated at api.slack.com/apps) |
+| `FRANK_AI_MENTION` | No | Slack mention text — defaults to `@Frank AI` if unset or empty |
+
+---
+
+## 3. Calling from Another Repo
+
+### 3.1 Prerequisites
+
+1. This repo (`Owner_XXX/rk`) must be **public**, or both repos must be in the same organization
+2. The caller repo must have `SLACK_WEBHOOK_URL` configured under **Settings → Secrets and variables → Actions → Secrets** (and optionally `FRANK_AI_MENTION`)
+3. The caller repo must enable **Settings → Actions → General → Workflow permissions → Read and write permissions**
+
+### 3.2 Configure Trigger Events
+
+In the caller workflow, set the `types` list to the PR events you want to trigger the notification. Edit as needed:
+
+```yaml
+on:
+  pull_request:
+    # Available types — add or remove as needed:
+    #   opened            - PR first created
+    #   synchronize       - new commits pushed (can be noisy)
+    #   reopened          - closed PR re-opened
+    #   closed            - PR closed (merged or not)
+    #   review_requested  - reviewer explicitly requested
+    #   review_request_removed - reviewer removed
+    #   ready_for_review  - draft converted to ready
+    #   converted_to_draft - ready converted back to draft
+    #   labeled           - label added
+    #   unlabeled         - label removed
+    #   assigned          - assignee added
+    #   unassigned        - assignee removed
+    types: [opened, reopened, ready_for_review, synchronize]
+```
+
+### 3.3 Add the Caller Workflow
+
+Create `.github/workflows/pr_caller.yml` in the caller repo:
+
+```yaml
+name: PR Caller
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, synchronize]
+
+jobs:
+  call-frank-ai-notifier:
+    uses: Owner_XXX/rk/.github/workflows/pr_slack_frank_ai_reviewer_trigger.yml@main
+    secrets: inherit
+    with:
+      pr_url: ${{ github.event.pull_request.html_url }}
+```
+
+> `secrets: inherit` automatically passes the caller repo's secrets to the reusable workflow — no need to list them explicitly.
+
+### 3.4 `uses` Path Reference
+
+The `uses` field supports two path formats depending on where the caller workflow lives:
+
+**Relative path** — only works when the caller and the reusable workflow are in the **same repo**:
+
+```yaml
+jobs:
+  call-frank-ai-notifier:
+    uses: ./.github/workflows/pr_slack_frank_ai_reviewer_trigger.yml
+```
+
+**Absolute path** — required when calling from a **different repo**:
+
+```yaml
+jobs:
+  call-frank-ai-notifier:
+    uses: Owner_XXX/rk/.github/workflows/pr_slack_frank_ai_reviewer_trigger.yml@main
+```
+
+The `@ref` suffix can be:
+
+| Ref | Example | Notes |
+|-----|---------|-------|
+| Branch | `@main` | Always uses the latest commit on that branch |
+| Tag | `@v1.0.0` | Pinned to a specific release |
+| Commit SHA | `@abc1234` | Most stable — immune to branch updates |
+
+---
+
+## 4. Local Testing
 
 ```bash
 pip install -r requirements.txt
 
-export ANTHROPIC_API_KEY=sk-ant-...
-export GITHUB_TOKEN=ghp_...
-export PR_NUMBER=1
-export REPO_FULL_NAME=owner/repo
-export SCORE_THRESHOLD=7
+export SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
+export PR_URL=https://github.com/owner/repo/pull/1
+export FRANK_AI_MENTION="@Frank AI"   # optional
 
-python agent/review.py
+python pr_slack_frank_ai_reviewer_trigger.py
 ```
