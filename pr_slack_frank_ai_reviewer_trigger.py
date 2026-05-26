@@ -2,7 +2,7 @@ import os
 import json
 import requests
 
-FRANK_AI_MENTION = os.environ.get("FRANK_AI_MENTION") or "@Frank AI"
+FRANK_AI_MENTION = os.environ.get("FRANK_AI_MENTION") or "<@U09RP27GWL8>"
 
 
 def build_slack_payload(pr_url: str) -> dict:
