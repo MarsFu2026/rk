@@ -118,7 +118,7 @@ pip install -r requirements.txt
 
 export SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
 export PR_URL=https://github.com/owner/repo/pull/1
-export FRANK_AI_MENTION="@Frank AI"   # optional
+export FRANK_AI_MENTION="<@U09RP27GWL8>"   # optional
 
 python pr_slack_frank_ai_reviewer_trigger.py
 ```
