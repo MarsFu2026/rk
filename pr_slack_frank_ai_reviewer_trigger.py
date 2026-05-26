@@ -2,7 +2,7 @@ import os
 import json
 import requests
 
-FRANK_AI_MENTION = os.environ.get("FRANK_AI_MENTION") or "@Frank AI"
+FRANK_AI_MENTION = os.environ.get("FRANK_AI_MENTION") or "<@U09RP27GWL8>"
 
 
 def build_slack_payload(pr_url: str) -> dict:
@@ -24,7 +24,6 @@ def main() -> None:
     )
     if resp.status_code != 200 or resp.text != "ok":
         raise RuntimeError(f"Slack notification failed: {resp.status_code} {resp.text}")
-    print(f"Slack notification sent: {pr_url}")
 
 
 if __name__ == "__main__":
