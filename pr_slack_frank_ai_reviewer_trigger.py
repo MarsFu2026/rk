@@ -24,7 +24,6 @@ def main() -> None:
     )
     if resp.status_code != 200 or resp.text != "ok":
         raise RuntimeError(f"Slack notification failed: {resp.status_code} {resp.text}")
-    print(f"Slack notification sent: {pr_url}")
 
 
 if __name__ == "__main__":
