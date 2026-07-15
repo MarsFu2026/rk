@@ -3,7 +3,7 @@
 
 REPO="你的账号/frank-ai-concurrency-test"
 BASE="master"
-PR_COUNT=5  # 同时创建5个PR
+PR_COUNT=3  # 同时创建5个PR
 
 for i in $(seq 1 $PR_COUNT); do
   BRANCH="test-pr-$i"

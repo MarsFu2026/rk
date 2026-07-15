@@ -14,10 +14,10 @@ jobs:
     continue-on-error: true
 
     steps:
-      - name: Simulate slow process (3 min)
+      - name: Simulate slow process (1 min)
         run: |
           echo "Starting slow review..."
-          sleep 180  # 模拟3分钟的处理时间
+          sleep 60  # 模拟3分钟的处理时间
           echo "Review complete"
       
       - name: Final fallback step
