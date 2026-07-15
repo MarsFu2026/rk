@@ -10,16 +10,12 @@ jobs:
   slow-review:
     runs-on: ubuntu-latest
     # 故意不设置 timeout-minutes
-    timeout-minutes: 2
-    continue-on-error: true
+    # timeout-minutes: 1
+    # continue-on-error: true
 
     steps:
       - name: Simulate slow process (1 min)
         run: |
           echo "Starting slow review..."
-          sleep 60  # 模拟3分钟的处理时间
+          sleep 120  # 模拟3分钟的处理时间
           echo "Review complete"
-      
-      - name: Final fallback step
-        if: always()
-        run: echo "AI review finished or timeout, mark job complete"
