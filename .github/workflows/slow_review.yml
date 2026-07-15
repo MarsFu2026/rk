@@ -17,7 +17,7 @@ jobs:
       - name: Simulate slow process (1 min)
         run: |
           echo "Starting slow review..."
-          sleep 90  # 模拟3分钟的处理时间
+          sleep 30  # 模拟3分钟的处理时间
           echo "Review complete"
       
       - name: Final fallback step
