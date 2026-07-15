@@ -1,0 +1,19 @@
+name: Slow Review Workflow
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# 故意不设置 concurrency 和 timeout（复现问题）
+
+jobs:
+  slow-review:
+    runs-on: ubuntu-latest
+    # 故意不设置 timeout-minutes
+
+    steps:
+      - name: Simulate slow process (15 min)
+        run: |
+          echo "Starting slow review..."
+          sleep 900  # 模拟15分钟的处理时间
+          echo "Review complete"
