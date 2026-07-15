@@ -1,3 +1,4 @@
 github_key.txt
 *.key
 *.pem
+.github/.DS_Store
