@@ -9,7 +9,7 @@ for i in $(seq 1 $PR_COUNT); do
   BRANCH="test-pr-$i"
   
   # 创建分支并push
-  git checkout -b $BRANCH master
+  git checkout -b $BRANCH main
   echo "test change $i - $(date)" > test_$i.txt
   git add . && git commit -m "test: PR $i"
   git push origin $BRANCH
