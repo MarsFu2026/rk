@@ -19,3 +19,7 @@ jobs:
           echo "Starting slow review..."
           sleep 180  # 模拟3分钟的处理时间
           echo "Review complete"
+      
+      - name: Final fallback step
+        if: always()
+        run: echo "AI review finished or timeout, mark job complete"
