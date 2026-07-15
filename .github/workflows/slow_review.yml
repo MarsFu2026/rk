@@ -17,5 +17,5 @@ jobs:
       - name: Simulate slow process (1 min)
         run: |
           echo "Starting slow review..."
-          sleep 120  # 模拟3分钟的处理时间
+          sleep 300  # 模拟3分钟的处理时间
           echo "Review complete"
