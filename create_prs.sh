@@ -1,16 +1,17 @@
 # create_prs.sh
 #!/bin/bash
 
-REPO="你的账号/frank-ai-concurrency-test"
-BASE="master"
-PR_COUNT=3  # 同时创建5个PR
+REPO="MarsFu2026/rk"
+BASE="main"
+PR_COUNT=10  # 同时创建5个PR
+NAME="m2"
 
 for i in $(seq 1 $PR_COUNT); do
-  BRANCH="test-pr-$i"
+  BRANCH="$NAME-pr-$i"
   
   # 创建分支并push
-  git checkout -b $BRANCH master
-  echo "test change $i - $(date)" > test_$i.txt
+  git checkout -b $BRANCH main
+  echo "test change $i - $(date)" > $NAME_$i.txt
   git add . && git commit -m "test: PR $i"
   git push origin $BRANCH
   
@@ -19,10 +20,10 @@ for i in $(seq 1 $PR_COUNT); do
     --repo $REPO \
     --base $BASE \
     --head $BRANCH \
-    --title "Test PR $i" \
+    --title "$NAME PR $i" \
     --body "Concurrency test PR $i"
   
-  git checkout master
+  git checkout main
 done
 
 echo "Created $PR_COUNT PRs simultaneously"
