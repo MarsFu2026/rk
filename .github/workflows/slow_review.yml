@@ -1,11 +1,8 @@
 name: Slow Review Workflow
 
 on:
-  workflow_call:
-    inputs:
-      pr_url:
-        required: true
-        type: string
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 # 故意不设置 concurrency 和 timeout（复现问题）
 
