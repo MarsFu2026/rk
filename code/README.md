@@ -1,55 +1,55 @@
-# UR団地 空室チェッカー
+# UR小区空房查询工具
 
-`check_ur_vacancy.py` は、CSVで管理している団地リストに対してUR賃貸の公式APIを叩き、
-**2DK / 2LDK / 3DK / 3LDK** の空室をまとめてCSV・Excelに出力するスクリプトです。
+`check_ur_vacancy.py` 读取 CSV 管理的小区列表，调用 UR 租房官方 API，
+批量查询 **2DK / 2LDK / 3DK / 3LDK** 的空房情况，并输出 CSV 和 Excel 文件。
 
 ---
 
-## ディレクトリ構成
+## 目录结构
 
 ```
 rk/
 ├── code/
-│   ├── check_ur_vacancy.py   # 本スクリプト
-│   └── README.md             # 本ドキュメント
+│   ├── check_ur_vacancy.py   # 本脚本
+│   └── README.md             # 本文档
 └── ur_agent/
-    ├── ur_danchi.csv          # 団地リスト（入力）
-    ├── ur_danchi.xlsx         # 団地リスト（参考用Excel）
+    ├── ur_danchi.csv          # 小区列表（输入）
+    ├── ur_danchi.xlsx         # 小区列表（参考用 Excel）
     └── aval/
-        ├── vacancy_YYYYMMDD_HHMMSS.csv    # 出力CSV
-        └── vacancy_YYYYMMDD_HHMMSS.xlsx   # 出力Excel
+        ├── vacancy_YYYYMMDD_HHMMSS.csv    # 输出 CSV
+        └── vacancy_YYYYMMDD_HHMMSS.xlsx   # 输出 Excel
 ```
 
 ---
 
-## 必要な環境
+## 环境要求
 
-| 項目 | 要件 |
+| 项目 | 要求 |
 |------|------|
-| Python | 3.9 以上 |
-| 外部ライブラリ | `openpyxl`（Excel出力に必要） |
+| Python | 3.9 及以上 |
+| 第三方库 | `openpyxl`（输出 Excel 需要） |
 
-標準ライブラリのみで動くため、`openpyxl` がなくてもCSVは出力されます。
+若未安装 `openpyxl`，脚本仍可正常运行，但只输出 CSV，不输出 Excel。
 
 ---
 
-## セットアップ
+## 初次配置
 
-### openpyxl のインストール（初回のみ）
+### 安装 openpyxl（仅需一次）
 
-macOS（Homebrewで管理されているPython環境）の場合：
+macOS（Homebrew 管理的 Python 环境）推荐使用虚拟环境：
 
 ```bash
-# 仮想環境を作成してインストール（推奨）
+# 创建虚拟环境并安装
 python3 -m venv ~/.venv/ur
 source ~/.venv/ur/bin/activate
 pip install openpyxl
 
-# 以降の実行時も同じ仮想環境を使う
+# 之后每次运行前激活环境即可
 source ~/.venv/ur/bin/activate
 ```
 
-または一時的な仮想環境（毎回不要）：
+或使用临时虚拟环境（无需每次激活）：
 
 ```bash
 python3 -m venv /tmp/xlenv
@@ -58,19 +58,19 @@ python3 -m venv /tmp/xlenv
 
 ---
 
-## 実行方法
+## 执行方法
 
-### 基本実行（リポジトリルートから）
+### 从仓库根目录运行
 
 ```bash
-# 仮想環境が有効な場合
+# 虚拟环境已激活时
 python3 code/check_ur_vacancy.py
 
-# /tmp/xlenv を使う場合
+# 使用 /tmp/xlenv 时
 /tmp/xlenv/bin/python3 code/check_ur_vacancy.py
 ```
 
-### 実行例
+### 执行示例输出
 
 ```
 === UR空室チェック開始: 20260810_194105 ===
@@ -93,79 +93,79 @@ Excel保存: /path/to/ur_agent/aval/vacancy_20260810_194105.xlsx
 
 ---
 
-## 出力ファイル
+## 输出文件说明
 
-ファイル名はタイムスタンプ形式で、実行のたびに新しいファイルが生成されます。
+文件名包含时间戳，每次执行生成新文件，不覆盖历史记录：
 
 ```
 vacancy_20260810_194105.csv
 vacancy_20260810_194105.xlsx
 ```
 
-### 出力列
+### 输出列说明
 
 | 列名 | 内容 |
 |------|------|
-| 番号 | 団地リストの連番 |
-| 団地名 | UR団地名 |
-| 最寄り駅 | 最寄り駅（二子玉川から） |
-| 二子玉川からの所要時間 | 乗車時間の目安 |
-| 間取り | 2DK / 2LDK / 3DK / 3LDK（空室なしの場合は「なし」） |
-| 部屋名 | 棟・部屋番号 |
-| 月額家賃 | 例: 152,400円 |
-| 共益費 | 例: 3,800円 |
-| 床面積 | 例: 61㎡ |
-| 階 | 例: 10階 |
-| URページ | 団地詳細ページURL（Excelではリンク付き） |
+| 番号 | 小区列表序号 |
+| 団地名 | UR 小区名称 |
+| 最寄り駅 | 最近车站（来自二子玉川） |
+| 二子玉川からの所要時間 | 乘车时间参考 |
+| 間取り | 户型（2DK / 2LDK / 3DK / 3LDK，无空房时显示「なし」） |
+| 部屋名 | 楼栋·房间号 |
+| 月額家賃 | 月租金，例：152,400円 |
+| 共益費 | 管理费，例：3,800円 |
+| 床面積 | 建筑面积，例：61㎡ |
+| 階 | 楼层，例：10階 |
+| URページ | 小区详情页 URL（Excel 中为可点击链接） |
 
-### Excelの見た目
+### Excel 样式说明
 
-- **緑色の行** → 空室あり（ヒット）
-- **グレー/白の行** → 空室なし
-- ヘッダー行は固定（スクロールしても表示される）
-- URページ列はクリック可能なハイパーリンク
+- **绿色行** → 有空房（命中）
+- **灰/白行** → 无空房
+- 首行冻结，滚动时始终可见
+- URページ 列为超链接，可直接点击跳转
 
 ---
 
-## カスタマイズ
+## 自定义配置
 
-`check_ur_vacancy.py` の冒頭の設定値を変更することで動作を調整できます。
+修改 `check_ur_vacancy.py` 开头的配置项即可调整行为：
 
 ```python
-# 対象とする間取り
+# 目标户型
 TARGET_TYPES = {"2DK", "2LDK", "3DK", "3LDK"}
 
-# リクエスト間隔（秒）：サーバー負荷軽減のため変更しないことを推奨
+# 请求间隔（秒），建议不低于 1.0，避免对服务器造成压力
 REQUEST_INTERVAL = 1.0
 
-# 入力CSVのパス（デフォルトはスクリプトから相対的に解決）
+# 输入 CSV 路径（默认相对于脚本位置自动解析）
 CSV_INPUT = Path(__file__).parent.parent / "ur_agent" / "ur_danchi.csv"
 
-# 出力先ディレクトリ
+# 输出目录
 OUTPUT_DIR = Path(__file__).parent.parent / "ur_agent" / "aval"
 ```
 
 ---
 
-## 定期実行（cron）
+## 定时自动执行（cron）
 
-毎日朝8時に自動チェックする例：
+每天早上 8 点自动查询的示例：
 
 ```bash
-# crontab -e で以下を追加
+# 执行 crontab -e，添加以下一行
 0 8 * * * /tmp/xlenv/bin/python3 /path/to/rk/code/check_ur_vacancy.py >> /tmp/ur_check.log 2>&1
 ```
 
 ---
 
-## 仕組み
+## 实现原理
 
-1. `ur_danchi.csv` の「団地URページ」列からURLパターン（例: `40_2690.html`）を解析し、
-   `shisya=40`, `danchi=269` のパラメータを自動抽出
-2. UR公式API `https://chintai.r6.ur-net.go.jp/chintai/api/bukken/detail/detail_bukken_room/`
-   にPOSTリクエストを送信
-3. レスポンスのJSONから `type` フィールドで間取りを絞り込み
-4. 全ページ（ページネーション対応）を取得してから出力
+1. 解析 `ur_danchi.csv` 中「団地URページ」列的 URL（如 `40_2690.html`），自动提取
+   `shisya=40`、`danchi=269` 参数
+2. 向 UR 官方 API POST 请求：
+   `https://chintai.r6.ur-net.go.jp/chintai/api/bukken/detail/detail_bukken_room/`
+3. 从返回 JSON 的 `type` 字段筛选目标户型
+4. 自动翻页，获取全部空房数据后再输出
 
-> ページURLとAPIパラメータの対応：`XX_YYYY.html` → `shisya=XX`, `danchi=int(YYYY)/10`
-> 例: `40_2690.html` → `shisya=40`, `danchi=269`
+> URL 与 API 参数的对应规则：`XX_YYYY.html` → `shisya=XX`，`danchi=int(YYYY)/10`
+> 例：`40_2690.html` → `shisya=40`，`danchi=269`
